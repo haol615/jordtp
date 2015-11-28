@@ -44,7 +44,8 @@ end
 def receiveFTP(received, portMap, hostMap)
 	dst = received[2]
 	localhost = Socket.gethostname
-	if dest == localhost then
+	if dst == localhost then
+		puts "destination"
 		source = received[1]
 		filePath = received[3]
 		fileName = received[4]
@@ -52,15 +53,16 @@ def receiveFTP(received, portMap, hostMap)
 		totalChunk = received[6].to_i
 		payload = received[7]
 		fullPath = "#{filePath}/#{fileName}"
+		puts fullPath
 		File.open(fullPath, 'a+b') do |file|
 			file.write(payload)
 		end
 		if currentChunk == totalChunk then
-			puts "FTP: #{source} --> fullPath"
+			puts "FTP: #{source} --> #{fullPath}"
 		end
 	else
 		str = received.join(',')
-		nextHop = $nextNode[received[2]]
+		nextHop = $nextNode[dst]
 		nextHopIP = hostMap[nextHop][0]
 		clientfunc2(nextHopIP, $testPort, str)
 	end
