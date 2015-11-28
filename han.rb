@@ -7,7 +7,7 @@ timeInterval=0;	#time per second to update routing table
 $state = false;
 native = Socket.gethostname;  #native host name
 puts "My hostname:"+native
-path="/home/core/Desktop/s1"  #path of s1 file
+path="/home/core/Downloads/s1"  #path of s1 file
 $time = Time.new;
 hostMap = Hash.new;
 postMap = Hash.new;
@@ -25,7 +25,7 @@ $testPort = 2051
 #clientfunc(portMap, nativeCost.map(), hostMap, lsps,preHostname)
 t3 = Thread.new{clock()}
 t1 = Thread.new {serverfunc(portMap[native].to_i,linkPackageMap, hostMap, nativeCost)}
-sleep(5)
+sleep(8)
 t2 = Thread.new {
 	clientfunc(portMap, hostMap, lsps, preHostname)
 }

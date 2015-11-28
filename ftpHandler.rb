@@ -25,7 +25,7 @@ def sendFtp(command, portMap, hostMap)
 
 	# Open the file, for each line, send it through, close the file
 	begin
-		fileSize = File.size(file)
+		fileSize = File.size(fileName)
 		time = Benchmark.realtime do
 			File.open(fileName, 'rb') do |file|
 				while chunk = file.read(SIZE) do
