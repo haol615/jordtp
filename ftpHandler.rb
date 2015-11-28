@@ -10,7 +10,7 @@ def sendFtp(command, portMap, hostMap)
 	count = 0;
 	localhost = Socket.gethostname
 
-	if !$nextNode.has_key?(dst)then
+	if !$nextNode.has_key?(dst) then
 		puts "HOST UNREACHABLE"
 		return
 	end
@@ -28,15 +28,15 @@ def sendFtp(command, portMap, hostMap)
 		fileSize = File.size(file)
 		time = Benchmark.realtime do
 			File.open(file, 'rb') do |file|
-				while chunk = file.read(SIZE)
+				while chunk = file.read(SIZE) do
 					msg = "FTP,#{localhost},#{dst},#{filePath},#{file},#{count},#{fileSize / SIZE},#{chunk}"
 					clientfunc2(nextHopIP, $testPort, msg)
-					count++
+					count = count + 1
 				end
 			end
 		end
 		puts "#{file} --> #{dst} in #{time} at #{fileSize / time}"
-	rescue => error
+	rescue
 		puts "FTP ERROR: #{file} --> #{dst} INTERRUPTED AFTER #{count * SIZE} bytes"
 	end
 end
@@ -64,3 +64,4 @@ def receiveFTP(received, portMap, hostMap)
 		nextHopIP = hostMap[nextHop][0]
 		clientfunc2(nextHopIP, $testPort, str)
 	end
+end
