@@ -5,7 +5,7 @@ SIZE = 512
 
 def sendFtp(command, portMap, hostMap)
 	dst = command[1]
-	file = command[2]
+	fileName = command[2]
 	filePath = command[3]
 	count = 0;
 	localhost = Socket.gethostname
@@ -15,7 +15,7 @@ def sendFtp(command, portMap, hostMap)
 		return
 	end
 
-	if !File.exist?(file) then
+	if !File.exist?(fileName) then
 		puts "FILE DOESN'T EXIST"
 		return
 	end
@@ -27,17 +27,17 @@ def sendFtp(command, portMap, hostMap)
 	begin
 		fileSize = File.size(file)
 		time = Benchmark.realtime do
-			File.open(file, 'rb') do |file|
+			File.open(fileName, 'rb') do |file|
 				while chunk = file.read(SIZE) do
-					msg = "FTP,#{localhost},#{dst},#{filePath},#{file},#{count},#{fileSize / SIZE},#{chunk}"
+					msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{count},#{fileSize / SIZE},#{chunk}"
 					clientfunc2(nextHopIP, $testPort, msg)
 					count = count + 1
 				end
 			end
 		end
-		puts "#{file} --> #{dst} in #{time} at #{fileSize / time}"
+		puts "#{fileName} --> #{dst} in #{time} at #{fileSize / time}"
 	rescue
-		puts "FTP ERROR: #{file} --> #{dst} INTERRUPTED AFTER #{count * SIZE} bytes"
+		puts "FTP ERROR: #{fileName} --> #{dst} INTERRUPTED AFTER #{count * SIZE} bytes"
 	end
 end
 
