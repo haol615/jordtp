@@ -46,7 +46,7 @@ def initial(path, native)
 	timeInterval = 0;
 	nodesPath = "";
 	nativeCost = CostPackage.new(native);
-	File.open(path+"/config", "r") do |f|   #read config to get weight file path and time interval
+File.open(path+"/config", "r") do |f|   #read config to get weight file path and time interval
 	f.each_line do |line|
 		input = line.split("=")
 		if input[0] == "weightFile" then weightPath = input[1]
