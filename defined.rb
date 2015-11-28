@@ -263,50 +263,50 @@ end
 
 #start dj
 def dij(linkPackageMap, native)
-	puts "start dij"
-	dist = Hash.new();
-	prevNode = Hash.new();
-	traversed = Array.new;
-	allNodes = linkPackageMap.keys;
-	#for i in 0..allNodes.length - 1
-	#	dist[allNodes[i]] = -1;
-	#	prevNode[allNodes[i]] = nil;
-	#end
-	dist[native] = 0;
-	prevNode[native] = native;
-	#q = PriorityQueue.new
-	#q[native] = 0;
+puts "start dij"
+dist = Hash.new();
+prevNode = Hash.new();
+traversed = Array.new;
+allNodes = linkPackageMap.keys;
+#for i in 0..allNodes.length - 1
+#	dist[allNodes[i]] = -1;
+#	prevNode[allNodes[i]] = nil;
+#end
+dist[native] = 0;
+prevNode[native] = native;
+#q = PriorityQueue.new
+#q[native] = 0;
 
-	q = Pqueue.new();
-	q.push(native, 0);
+q = Pqueue.new();
+q.push(native, 0);
 
 
-	until q.isEmpty()
-		u, distance = q.pop();
-		traversed.push(u);
-		#puts u;
-		#puts distance;
-		uNeighborMap = linkPackageMap[u].map();
-		#puts uNeighborMap.keys;
-		uNeighbors = uNeighborMap.keys
-		for i in 0..uNeighbors.length - 1
-			#puts uNeighbors[i]
-			if !traversed.include?(uNeighbors[i]) then
-				newDistance = dist[u].to_i + uNeighborMap[uNeighbors[i]].to_i;
-				if dist[uNeighbors[i]] == nil then
-					dist[uNeighbors[i]] = newDistance
-					prevNode[uNeighbors[i]] = u;
-				else 
-					if newDistance < dist[uNeighbors[i]] then
-					dist[uNeighbors[i]] = newDistance
-					prevNode[uNeighbors[i]] = u;
-					end
+until q.isEmpty()
+	u, distance = q.pop();
+	traversed.push(u);
+	#puts u;
+	#puts distance;
+	uNeighborMap = linkPackageMap[u].map();
+	#puts uNeighborMap.keys;
+	uNeighbors = uNeighborMap.keys
+	for i in 0..uNeighbors.length - 1
+		#puts uNeighbors[i]
+		if !traversed.include?(uNeighbors[i]) then
+			newDistance = dist[u].to_i + uNeighborMap[uNeighbors[i]].to_i;
+			if dist[uNeighbors[i]] == nil then
+				dist[uNeighbors[i]] = newDistance
+				prevNode[uNeighbors[i]] = u;
+			else 
+				if newDistance < dist[uNeighbors[i]] then
+				dist[uNeighbors[i]] = newDistance
+				prevNode[uNeighbors[i]] = u;
 				end
-				q.push(uNeighbors[i], dist[uNeighbors[i]].to_i);
-				#q[uNeighbors[i]] = dist[uNeighbors[i]].to_i;
 			end
-				
+			q.push(uNeighbors[i], dist[uNeighbors[i]].to_i);
+			#q[uNeighbors[i]] = dist[uNeighbors[i]].to_i;
 		end
+			
+	end
 
 end
 
