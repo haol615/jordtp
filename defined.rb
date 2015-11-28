@@ -1,4 +1,5 @@
 require_relative 'pqueue'
+require_relative 'ftpHandler'
 require 'socket'
 require 'time'
 ####################################################################
@@ -45,7 +46,7 @@ def initial(path, native)
 	timeInterval = 0;
 	nodesPath = "";
 	nativeCost = CostPackage.new(native);
-File.open(path+"/config", "r") do |f|   #read config to get weight file path and time interval
+	File.open(path+"/config", "r") do |f|   #read config to get weight file path and time interval
 	f.each_line do |line|
 		input = line.split("=")
 		if input[0] == "weightFile" then weightPath = input[1]
@@ -161,7 +162,7 @@ def serverfunc(portMap, linkPackageMap, hostMap, nativeCost)
 			when "TRACEROUTE"
 				func4()
 			when "FTP"
-				func5()
+				receiveFTP(received, portMap, hostMap)
 			when "CLOCKSYNC"
 				func6()
 			when "ADVERTISE"
@@ -228,6 +229,8 @@ def getUserCommand(portMap, costMap, hostMap, nativeCost)
 		getRoutingtable(hostMap, nativeCost.instance_variable_get(:@source), command[1]);
 	when "PING"
 		ping_client(command, portMap, hostMap)
+	when "FTP"
+		sendFtp(command, portMap, hostMap)
 	end
 
 	}
@@ -260,50 +263,50 @@ end
 
 #start dj
 def dij(linkPackageMap, native)
-puts "start dij"
-dist = Hash.new();
-prevNode = Hash.new();
-traversed = Array.new;
-allNodes = linkPackageMap.keys;
-#for i in 0..allNodes.length - 1
-#	dist[allNodes[i]] = -1;
-#	prevNode[allNodes[i]] = nil;
-#end
-dist[native] = 0;
-prevNode[native] = native;
-#q = PriorityQueue.new
-#q[native] = 0;
+	puts "start dij"
+	dist = Hash.new();
+	prevNode = Hash.new();
+	traversed = Array.new;
+	allNodes = linkPackageMap.keys;
+	#for i in 0..allNodes.length - 1
+	#	dist[allNodes[i]] = -1;
+	#	prevNode[allNodes[i]] = nil;
+	#end
+	dist[native] = 0;
+	prevNode[native] = native;
+	#q = PriorityQueue.new
+	#q[native] = 0;
 
-q = Pqueue.new();
-q.push(native, 0);
+	q = Pqueue.new();
+	q.push(native, 0);
 
 
-until q.isEmpty()
-	u, distance = q.pop();
-	traversed.push(u);
-	#puts u;
-	#puts distance;
-	uNeighborMap = linkPackageMap[u].map();
-	#puts uNeighborMap.keys;
-	uNeighbors = uNeighborMap.keys
-	for i in 0..uNeighbors.length - 1
-		#puts uNeighbors[i]
-		if !traversed.include?(uNeighbors[i]) then
-			newDistance = dist[u].to_i + uNeighborMap[uNeighbors[i]].to_i;
-			if dist[uNeighbors[i]] == nil then
-				dist[uNeighbors[i]] = newDistance
-				prevNode[uNeighbors[i]] = u;
-			else 
-				if newDistance < dist[uNeighbors[i]] then
-				dist[uNeighbors[i]] = newDistance
-				prevNode[uNeighbors[i]] = u;
+	until q.isEmpty()
+		u, distance = q.pop();
+		traversed.push(u);
+		#puts u;
+		#puts distance;
+		uNeighborMap = linkPackageMap[u].map();
+		#puts uNeighborMap.keys;
+		uNeighbors = uNeighborMap.keys
+		for i in 0..uNeighbors.length - 1
+			#puts uNeighbors[i]
+			if !traversed.include?(uNeighbors[i]) then
+				newDistance = dist[u].to_i + uNeighborMap[uNeighbors[i]].to_i;
+				if dist[uNeighbors[i]] == nil then
+					dist[uNeighbors[i]] = newDistance
+					prevNode[uNeighbors[i]] = u;
+				else 
+					if newDistance < dist[uNeighbors[i]] then
+					dist[uNeighbors[i]] = newDistance
+					prevNode[uNeighbors[i]] = u;
+					end
 				end
+				q.push(uNeighbors[i], dist[uNeighbors[i]].to_i);
+				#q[uNeighbors[i]] = dist[uNeighbors[i]].to_i;
 			end
-			q.push(uNeighbors[i], dist[uNeighbors[i]].to_i);
-			#q[uNeighbors[i]] = dist[uNeighbors[i]].to_i;
+				
 		end
-			
-	end
 
 end
 
