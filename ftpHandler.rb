@@ -27,13 +27,15 @@ def sendFtp(command, portMap, hostMap)
 	begin
 		fileSize = File.size(fileName)
 		time = Benchmark.realtime do
+			socket = TCPSocket.open(nextHopIP, $testPort)
 			File.open(fileName, 'rb') do |file|
 				while chunk = file.read(SIZE) do
-					msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{count},#{fileSize / SIZE},#{chunk}"
-					clientfunc2(nextHopIP, $testPort, msg)
+					msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{chunk}"
+					socket.write(msg)
 					count = count + 1
 				end
 			end
+			socket.close
 		end
 		puts "#{fileName} --> #{dst} in #{time} at #{fileSize / time}"
 	rescue
