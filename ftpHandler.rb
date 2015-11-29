@@ -37,7 +37,6 @@ def sendFtp(command, portMap, hostMap)
 					count = count + 1
 				end
 			end
-			socket.write('\EOF')
 			puts 'done sending'
 			puts 'sleep for 10 before closing socket'
 			sleep(10)
@@ -60,13 +59,15 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 		fileSize = received[5].to_i
 		fullPath = "#{filePath}/#{fileName}"
 		buf = []
-		while(fragment = socketClient.recv(SIZE)) do
-			if fragment == '\EOF' then
+		while true do
+			fragment = socketClient.recv(SIZE)
+			if fragment.size == 0 then
 				break
 			end
-			puts buf.size
 			buf << fragment
+			puts buf.size
 		end
+		
 		puts 'done receiving'
 		if buf.size == fileSize then
 			puts 'writing to file'
@@ -85,8 +86,9 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 		nextHopSocket = TCPSocket.open(nextHopIP, $testPort)
 		str = received.join(',')
 		nextHopSocket.write(str)
-		while(fragment = socketClient.recv(SIZE)) do
-			if fragment == '\EOF' then
+		while true do
+			fragment = socketClient.recv(SIZE)
+			if fragment.size == 0 then
 				break
 			end
 			puts '.'
