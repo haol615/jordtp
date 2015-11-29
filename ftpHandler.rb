@@ -37,7 +37,10 @@ def sendFtp(command, portMap, hostMap)
 					count = count + 1
 				end
 			end
+			socket.write('\EOF')
 			puts 'done sending'
+			puts 'sleep for 10 before closing socket'
+			sleep(10)
 			socket.close
 		end
 		puts "#{fileName} --> #{dst} in #{time} at #{fileSize / time}"
@@ -58,6 +61,10 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 		fullPath = "#{filePath}/#{fileName}"
 		buf = []
 		while(fragment = socketClient.recv(SIZE)) do
+			if fragment == '\EOF' then
+				break
+			end
+			puts buf.size
 			buf << fragment
 		end
 		puts 'done receiving'
@@ -79,6 +86,9 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 		str = received.join(',')
 		nextHopSocket.write(str)
 		while(fragment = socketClient.recv(SIZE)) do
+			if fragment == '\EOF' then
+				break
+			end
 			puts '.'
 			nextHopSocket.write(fragment)
 		end
