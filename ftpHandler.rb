@@ -31,6 +31,7 @@ def sendFtp(command, portMap, hostMap)
 			File.open(fileName, 'rb') do |file|
 				msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{fileSize}"
 				socket.write(msg)
+				sleep(1)
 				while chunk = file.read(SIZE) do
 					puts '.'
 					socket.write(chunk)
@@ -67,7 +68,7 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 			buf << fragment
 			puts buf.size
 		end
-		
+
 		puts 'done receiving'
 		if buf.size == fileSize then
 			puts 'writing to file'
@@ -85,9 +86,13 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 		nextHopIP = hostMap[nextHop][0]
 		nextHopSocket = TCPSocket.open(nextHopIP, $testPort)
 		str = received.join(',')
+		puts "B]: #{str}"
 		nextHopSocket.write(str)
 		while true do
 			fragment = socketClient.recv(SIZE)
+			puts "*****"
+			puts "B]: #{fragment}"
+			puts "*****"
 			if fragment.size == 0 then
 				break
 			end
