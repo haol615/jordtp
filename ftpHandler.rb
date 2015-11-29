@@ -29,9 +29,10 @@ def sendFtp(command, portMap, hostMap)
 		time = Benchmark.realtime do
 			socket = TCPSocket.open(nextHopIP, $testPort)
 			File.open(fileName, 'rb') do |file|
+				msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{fileSize}"
+				socket.write(msg)
 				while chunk = file.read(SIZE) do
-					msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{chunk}"
-					socket.write(msg)
+					socket.write(chunk)
 					count = count + 1
 				end
 			end
@@ -43,29 +44,36 @@ def sendFtp(command, portMap, hostMap)
 	end
 end
 
-def receiveFTP(received, portMap, hostMap)
+def receiveFTP(received, portMap, hostMap, socketClient)
 	dst = received[2]
 	localhost = Socket.gethostname
 	if dst == localhost then
-		puts "destination"
 		source = received[1]
 		filePath = received[3]
 		fileName = received[4]
-		currentChunk = received[5].to_i
-		totalChunk = received[6].to_i
-		payload = received[7]
+		fileSize = received[5].to_i
 		fullPath = "#{filePath}/#{fileName}"
-		puts fullPath
-		File.open(fullPath, 'a+b') do |file|
-			file.write(payload)
+		buf = []
+		while(fragment = socketClient.recv(SIZE)) do
+			buf << fragment
 		end
-		if currentChunk == totalChunk then
+		if buf == fileSize then
+			File.open(fullPath, 'a+b') do |file|
+				file.write(buf)
+			end
 			puts "FTP: #{source} --> #{fullPath}"
+		else
+			puts "FTP ERROR: #{source} --> #{fullPath}"
 		end
 	else
-		str = received.join(',')
 		nextHop = $nextNode[dst]
 		nextHopIP = hostMap[nextHop][0]
-		clientfunc2(nextHopIP, $testPort, str)
+		nextHopSocket = TCPSocket.open(nextHopIP, $testPort)
+		str = received.join(',')
+		nextHopSocket.write(str)
+		while(fragment = socketClient.recv(SIZE)) do
+			nextHopSocket.write(fragment)
+		end
+		nextHopSocket.close
 	end
 end

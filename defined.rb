@@ -150,25 +150,25 @@ def serverfunc(portMap, linkPackageMap, hostMap, nativeCost)
 			puts line
 			received = line.split(",")
 			case received[0]
-			when "FLOODING"
-				puts "flooding function is chosen"
-				flooding(nativeCost, timeOut, received, linkPackageMap, localhost, portMap, hostMap)
-			when "SNDMSG"
-				func2()
-			when "PING"
-				ping_server(received, portMap, hostMap)
-			when "PING_ACK"
-				ping_ack_server(received, portMap, hostMap)
-			when "TRACEROUTE"
-				func4()
-			when "FTP"
-				receiveFTP(received, portMap, hostMap)
-			when "CLOCKSYNC"
-				func6()
-			when "ADVERTISE"
-				func7()
-			else
-				func8()
+				when "FLOODING"
+					puts "flooding function is chosen"
+					flooding(nativeCost, timeOut, received, linkPackageMap, localhost, portMap, hostMap)
+				when "SNDMSG"
+					func2()
+				when "PING"
+					ping_server(received, portMap, hostMap)
+				when "PING_ACK"
+					ping_ack_server(received, portMap, hostMap)
+				when "TRACEROUTE"
+					func4()
+				when "FTP"
+					receiveFTP(received, portMap, hostMap, client)
+				when "CLOCKSYNC"
+					func6()
+				when "ADVERTISE"
+					func7()
+				else
+					func8()
 			end
 			client.close
 		end
