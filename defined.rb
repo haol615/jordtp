@@ -146,7 +146,7 @@ def serverfunc(portMap, linkPackageMap, hostMap, nativeCost)
 
 		Thread.start(server.accept) do |client|
 
-			line = client.recv(1024)
+			line = client.recv(2048)
 			puts line
 			received = line.split(",")
 			case received[0]

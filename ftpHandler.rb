@@ -1,7 +1,7 @@
 require 'socket'
 require 'benchmark'
 
-SIZE = 512
+SIZE = 1024
 
 def sendFtp(command, portMap, hostMap)
 	dst = command[1]
@@ -32,10 +32,12 @@ def sendFtp(command, portMap, hostMap)
 				msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{fileSize}"
 				socket.write(msg)
 				while chunk = file.read(SIZE) do
+					puts '.'
 					socket.write(chunk)
 					count = count + 1
 				end
 			end
+			puts 'done sending'
 			socket.close
 		end
 		puts "#{fileName} --> #{dst} in #{time} at #{fileSize / time}"
@@ -48,6 +50,7 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 	dst = received[2]
 	localhost = Socket.gethostname
 	if dst == localhost then
+		puts 'destination'
 		source = received[1]
 		filePath = received[3]
 		fileName = received[4]
@@ -57,21 +60,26 @@ def receiveFTP(received, portMap, hostMap, socketClient)
 		while(fragment = socketClient.recv(SIZE)) do
 			buf << fragment
 		end
-		if buf == fileSize then
+		puts 'done receiving'
+		if buf.size == fileSize then
+			puts 'writing to file'
 			File.open(fullPath, 'a+b') do |file|
 				file.write(buf)
 			end
 			puts "FTP: #{source} --> #{fullPath}"
 		else
+			puts 'error'
 			puts "FTP ERROR: #{source} --> #{fullPath}"
 		end
 	else
+		puts 'bridge'
 		nextHop = $nextNode[dst]
 		nextHopIP = hostMap[nextHop][0]
 		nextHopSocket = TCPSocket.open(nextHopIP, $testPort)
 		str = received.join(',')
 		nextHopSocket.write(str)
 		while(fragment = socketClient.recv(SIZE)) do
+			puts '.'
 			nextHopSocket.write(fragment)
 		end
 		nextHopSocket.close
