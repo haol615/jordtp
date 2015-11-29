@@ -26,19 +26,19 @@ def sendFtp(command, portMap, hostMap)
 	# Open the file, for each line, send it through, close the file
 	begin
 		fileSize = File.size(fileName)
-		time = Benchmark.realtime do
-			socket = TCPSocket.open(nextHopIP, $testPort)
-			File.open(fileName, 'rb') do |file|
-				msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{fileSize}"
-				socket.write(msg)
-				sleep(1)
-				while chunk = file.read(SIZE) do
-					socket.write(chunk)
-					count = count + 1
-				end
+		currTime = $time
+		socket = TCPSocket.open(nextHopIP, $testPort)
+		File.open(fileName, 'rb') do |file|
+			msg = "FTP,#{localhost},#{dst},#{filePath},#{fileName},#{fileSize}"
+			socket.write(msg)
+			sleep(1)
+			while chunk = file.read(SIZE) do
+				socket.write(chunk)
+				count = count + 1
 			end
-			socket.close
 		end
+		socket.close
+		time = $time - currTime
 		puts "#{fileName} --> #{dst} in #{time} at #{fileSize / time}"
 	rescue
 		puts "FTP ERROR: #{fileName} --> #{dst} INTERRUPTED AFTER #{count * SIZE} bytes"
