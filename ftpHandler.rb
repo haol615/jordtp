@@ -21,7 +21,7 @@ def sendFtp(command, portMap, hostMap)
 	end
 
 	nextHop = $nextNode[dst]
-	nextHopIP = hostMap[nextHop][0]
+	nextHopIP = if hostMap[nextHop] == nil then '127.0.0.1' else hostMap[nextHop][0] end
 
 	# Open the file, for each line, send it through, close the file
 	begin
